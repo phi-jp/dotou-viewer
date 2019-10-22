@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
-process.env["NODE_CONFIG_DIR"] = process.cwd();
-const config = require('config');
-console.log(config);
-
+const fs = require('fs');
+const yaml = require('js-yaml');
+const config = yaml.safeLoad(fs.readFileSync(`${process.cwd()}/dotou.yaml`));
 const express = require('express');
 const app = express();
 

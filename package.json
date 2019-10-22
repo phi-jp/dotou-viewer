@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/phi-jp/dotou-viewer#readme",
   "dependencies": {
-    "config": "^3.2.3",
     "express": "^4.17.1",
     "js-yaml": "^3.13.1"
   }
