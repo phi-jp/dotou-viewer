@@ -1,3 +1,5 @@
 #!/usr/bin/env node
 
-console.log('Hello, dotou!');
+process.env["NODE_CONFIG_DIR"] = process.cwd();
+const config = require('config');
+console.log(config);
