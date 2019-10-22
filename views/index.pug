@@ -36,4 +36,8 @@ html.h-full
     script(src='//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.10/build/highlight.min.js')
 
   body
-    div hoge
+    div(data-is='app')
+
+    script(type='riot/tag', template='jade', src='/app.pug')
+    script.
+      riot.mount('app');

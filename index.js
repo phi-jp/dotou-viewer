@@ -8,7 +8,8 @@ const express = require('express');
 const app = express();
 
 // setup express
-app.use(express.static('public'));
+app.use(express.static(`${__dirname}/public`));
+app.use(express.static(`${process.cwd()}`));
 
 // setup pug
 app.set('views', path.join(__dirname, 'views'));
@@ -16,7 +17,9 @@ app.set('view engine', 'pug');
 
 // setup routing
 app.get('/', async (req, res) => {
-  res.render('index', config);
+  res.render('index', {
+    config
+  });
 });
 
 app.get('/config', async (req, res) => {

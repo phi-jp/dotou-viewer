@@ -1,0 +1,59 @@
+app
+  div.f.h-full
+    div.side.w300.flex-fixed.bg-whitesmoke.overflow-scroll(ref='menus')
+      h1.fs20.f.fh.py32 {config.title}
+      div
+        div.mb32(each='{section in config.sections}')
+          h2.fs14.pl16.mb16 {section.id}. {section.label}
+          div(each='{item in section.items}', class='{"text-royalblue": currentItem === item}')
+            a.block.px16.py8(href='./{section.id}/{item.id}.html', target='preview', onclick='{onclick}', data-hash='{section.id}/{item.id}')
+              span.fs12.line-clamp-1 {item.id}. {item.label}
+    div.main.w-full.f
+      div.col8.h-full.p16
+        div.f.flex-between.fm.mb16
+          h2 {currentItem.id}. {currentItem.label}
+          button.button.ml8(onclick='{reload}') reload
+        pre(if='{code}')
+          code.fs13 {code}
+      div.col4.h-full.p16.bg-whitesmoke
+        iframe.bg-white.border.s-full(name='preview')
+  style(scoped, type='less').
+    :scope {
+      display: block;
+      height: 100vh;
+    }
+  script.
+    this.config = {};
+    this.on('mount', async () => {
+      var res = await fetch('/config');
+      this.config = await res.json();
+      this.update();
+
+      var hash = location.hash.substr(1);
+      if (hash) {
+        // var [section_id, item_id] = hash.split('/');
+        var target = document.querySelector(`[data-hash="${hash}"]`);
+        target.click();
+        $(this.refs.menus).animate({
+          scrollTop: target.offsetTop - 30,
+        });
+      }
+    });
+    this.onclick = async (e) => {
+      location.hash = e.currentTarget.dataset.hash;
+      var res = await fetch(e.currentTarget.href);
+      this.currentItem = e.item.item;
+      this.code = null;
+      this.update();
+      this.code = await res.text();
+      this.update();
+      
+      document.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightBlock(block);
+      });
+    };
+    this.reload = () => {
+      var hash = location.hash.substr(1);
+      var target = document.querySelector(`[data-hash="${hash}"]`);
+      target.click();
+    };
