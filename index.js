@@ -16,7 +16,7 @@ app.set('view engine', 'pug');
 
 // setup routing
 app.get('/', async (req, res) => {
-  res.render('index');
+  res.render('index', config);
 });
 
 app.get('/config', async (req, res) => {
