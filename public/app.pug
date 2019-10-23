@@ -6,7 +6,7 @@ app
         div.mb32(each='{section in config.sections}')
           h2.fs14.pl16.mb16 {section.id}. {section.label}
           div(each='{item in section.items}', class='{"text-royalblue": currentItem === item}')
-            a.block.px16.py8(href='./{section.id}/{item.id}.html', target='preview', onclick='{onclick}', data-hash='{section.id}/{item.id}')
+            a.link-item.block.px16.py8(href='./{section.id}/{item.id}.html', target='preview', onclick='{onclick}', data-hash='{section.id}/{item.id}')
               span.fs12.line-clamp-1 {item.id}. {item.label}
     div.main.w-full.f
       div.col8.h-full.p16
@@ -33,11 +33,15 @@ app
       if (hash) {
         // var [section_id, item_id] = hash.split('/');
         var target = document.querySelector(`[data-hash="${hash}"]`);
-        target.click();
-        $(this.refs.menus).animate({
-          scrollTop: target.offsetTop - 30,
-        });
       }
+      else {
+        var target = document.querySelector('.link-item');
+      }
+      
+      target.click();
+      $(this.refs.menus).animate({
+        scrollTop: target.offsetTop - 30,
+      });
     });
     this.onclick = async (e) => {
       location.hash = e.currentTarget.dataset.hash;
