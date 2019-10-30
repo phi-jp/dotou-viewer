@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const pug = require('pug');
 const config = yaml.safeLoad(fs.readFileSync(`${process.cwd()}/dotou.yaml`));
 const express = require('express');
 const app = express();
@@ -25,6 +26,16 @@ app.get('/', async (req, res) => {
 app.get('/config', async (req, res) => {
   res.json(config);
 });
+
+// pug のときは pug を html に変換して返す
+if (config.type === 'pug') {
+  app.get('/:section_id/:item_id', (req, res) => {
+    var html = pug.renderFile(process.cwd() + `${req.url}.pug`, {
+      pretty: true,
+    });
+    res.send(html);
+  });
+}
 
 // Start the server
 const PORT = process.env.PORT || 8887;

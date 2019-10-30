@@ -2,21 +2,34 @@ app
   div.f.h-full
     div.side.w300.flex-fixed.bg-whitesmoke.overflow-scroll(ref='menus')
       h1.fs20.f.fh.py32 {config.title}
-      div
+
+      //- html の場合
+      div(if='{!config.type || config.type === "html"}')
         div.mb32(each='{section in config.sections}')
           h2.fs14.pl16.mb16 {section.id}. {section.label}
           div(each='{item in section.items}', class='{"text-royalblue": currentItem === item}')
             a.link-item.block.px16.py8(href='./{section.id}/{item.id}.html', target='preview', onclick='{onclick}', data-hash='{section.id}/{item.id}')
               span.fs12.line-clamp-1 {item.id}. {item.label}
+      //- pug の場合
+      div(if='{config.type === "pug"}')
+        div.mb32(each='{section in config.sections}')
+          h2.fs14.pl16.mb16 {section.id}. {section.label}
+          div(each='{item in section.items}', class='{"text-royalblue": currentItem === item}')
+            a.link-item.block.px16.py8(href='./{section.id}/{item.id}', data-file='./{section.id}/{item.id}.pug', target='preview', onclick='{onclick}', data-hash='{section.id}/{item.id}')
+              span.fs12.line-clamp-1 {item.id}. {item.label}
     div.main.w-full.f
       div.col8.h-full.p16
         div.f.flex-between.fm.mb16
           h2 {currentItem.id}. {currentItem.label}
-          button.button.ml8(onclick='{reload}') reload
+          div.f.fm
+            a.button.ml8(href='{refs.preview.contentWindow && refs.preview.contentWindow.location.href}', target='_blank')
+              i.material-icons fullscreen
+            button.button.ml8(onclick='{reload}')
+              i.material-icons refresh
         pre(if='{code}')
           code.fs13 {code}
       div.col4.h-full.p16.bg-whitesmoke
-        iframe.bg-white.border.s-full(name='preview')
+        iframe.bg-white.border.s-full(name='preview', ref='preview')
   style(scoped, type='less').
     :scope {
       display: block;
@@ -24,6 +37,7 @@ app
     }
   script.
     this.config = {};
+    this.currentItem = {};
     this.on('mount', async () => {
       var res = await fetch('/config');
       this.config = await res.json();
@@ -45,7 +59,14 @@ app
     });
     this.onclick = async (e) => {
       location.hash = e.currentTarget.dataset.hash;
-      var res = await fetch(e.currentTarget.href);
+
+      var file = e.currentTarget.href;
+      // pug 対応
+      if (this.config.type === 'pug') {
+        file = file += '.pug';
+      }
+      var res = await fetch(file);
+      
       this.currentItem = e.item.item;
       this.code = null;
       this.update();
@@ -56,6 +77,7 @@ app
         hljs.highlightBlock(block);
       });
     };
+
     this.reload = () => {
       var hash = location.hash.substr(1);
       var target = document.querySelector(`[data-hash="${hash}"]`);
