@@ -22,7 +22,7 @@ app
         div.f.flex-between.fm.mb16
           h2 {currentItem.id}. {currentItem.label}
           div.f.fm
-            a.button.ml8(href='{refs.preview.contentWindow && refs.preview.contentWindow.location.href}', target='_blank')
+            a.button.ml8(href='{refs.preview && refs.preview.contentWindow.location.href}', target='_blank')
               i.material-icons fullscreen
             button.button.ml8(onclick='{reload}')
               i.material-icons refresh
