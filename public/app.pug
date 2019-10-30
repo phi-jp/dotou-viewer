@@ -18,7 +18,7 @@ app
             a.link-item.block.px16.py8(href='./{section.id}/{item.id}', data-file='./{section.id}/{item.id}.pug', target='preview', onclick='{onclick}', data-hash='{section.id}/{item.id}')
               span.fs12.line-clamp-1 {item.id}. {item.label}
     div.main.w-full.f
-      div.col8.h-full.p16
+      div#code.col8.h-full.p16
         div.f.flex-between.fm.mb16
           h2 {currentItem.id}. {currentItem.label}
           div.f.fm
@@ -28,8 +28,8 @@ app
               i.material-icons refresh
         pre(if='{code}')
           code.fs13 {code}
-      div.col4.h-full.p16.bg-whitesmoke
-        iframe.bg-white.border.s-full(name='preview', ref='preview')
+      div#preview.col4.h-full.p16.bg-whitesmoke
+        iframe.bg-white.border-none.s-full(name='preview', ref='preview')
   style(scoped, type='less').
     :scope {
       display: block;
@@ -55,6 +55,17 @@ app
       target.click();
       $(this.refs.menus).animate({
         scrollTop: target.offsetTop - 30,
+      });
+
+      // split
+      var sizes = localStorage.getItem('split-sizes');
+      sizes = sizes ? JSON.parse(sizes) : [50, 50];
+
+      Split(['#code', '#preview'], {
+        sizes: sizes,
+        onDragEnd: (sizes) => {
+          localStorage.setItem('split-sizes', JSON.stringify(sizes));
+        }
       });
     });
     this.onclick = async (e) => {
