@@ -7,7 +7,7 @@ app
         div.mb32(each='{section in config.sections}')
           h2.fs14.pl16.mb16 {section.id}. {section.label}
           div(each='{item in section.items}', class='{"text-royalblue": currentItem === item}')
-            a.link-item.block.px16.py8(href='{section.id}/{item.id}', target='preview', onclick='{onclick}', data-hash='{section.id}/{item.id}')
+            a.link-item.block.px16.py8(href='{section.id}/{item.id}', onclick='{onclick}', data-hash='{section.id}/{item.id}')
               span.fs12.line-clamp-1 {item.id}. {item.label}
     div.main.w-full.f(show='{currentItem}')
       div#code.col8.h-full.p16
@@ -21,7 +21,7 @@ app
         pre(if='{code}')
           code.fs13 {code}
       div#preview.col4.h-full.p16.bg-whitesmoke
-        iframe.bg-white.border-none.s-full(name='preview', ref='preview')
+        iframe.bg-white.border-none.s-full(name='preview', ref='preview', src='{currentItem.path}')
   style(scoped, type='less').
     :scope {
       display: block;
@@ -38,10 +38,6 @@ app
     this.on('mount', async () => {
       // setup config
       await this.fetchConfig();
-      // watch config
-      setInterval(() => {
-        this.fetchConfig();
-      }, 2 * 1000);
 
       var hash = location.hash.substr(1);
       if (hash) {
@@ -52,6 +48,8 @@ app
           scrollTop: target.offsetTop - 30,
         });
       }
+
+      this.watch();
       
       // split
       var sizes = localStorage.getItem('split-sizes');
@@ -98,7 +96,25 @@ app
       return false;
     };
 
+    this.watch = async () => {
+      this.fetchConfig();
+
+      if (this.currentItem) {
+        var is_refresh = await this.fetchCode(this.currentItem.filename);
+
+        if (is_refresh) {
+          this.reload();
+        }
+      }
+      // 再帰呼び出し
+      setTimeout(() => {
+        this.watch();
+
+      }, 2 * 1000);
+    };
+
     this.onclick = async (e) => {
+      e.preventDefault();
       location.hash = e.currentTarget.dataset.hash;
 
       var filename = e.currentTarget.href;
@@ -115,7 +131,5 @@ app
     };
 
     this.reload = () => {
-      var hash = location.hash.substr(1);
-      var target = document.querySelector(`[data-hash="${hash}"]`);
-      target.click();
+      this.refs.preview.contentWindow.location.reload();
     };
