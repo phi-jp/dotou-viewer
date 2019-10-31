@@ -44,8 +44,9 @@ app
     this.config = {};
     this.currentItem = {};
     this.on('mount', async () => {
-      var res = await fetch('/config');
-      this.config = await res.json();
+      var res = await fetch('dotou.yaml');
+      var text = await res.text();
+      this.config = jsyaml.load(text);
       this.update();
 
       var hash = location.hash.substr(1);
