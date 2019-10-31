@@ -1,23 +1,15 @@
 app
   div.f.h-full
     div.side.w300.flex-fixed.bg-whitesmoke.overflow-scroll(ref='menus')
-      h1.fs20.f.fh.py32 {config.title}
-
-      //- html の場合
-      div(if='{!config.type || config.type === "html"}')
+      h1.fs20.f.fh.py32
+        a(href='/') {config.title}
+      div
         div.mb32(each='{section in config.sections}')
           h2.fs14.pl16.mb16 {section.id}. {section.label}
           div(each='{item in section.items}', class='{"text-royalblue": currentItem === item}')
-            a.link-item.block.px16.py8(href='./{section.id}/{item.id}.html', target='preview', onclick='{onclick}', data-hash='{section.id}/{item.id}')
+            a.link-item.block.px16.py8(href='{section.id}/{item.id}', target='preview', onclick='{onclick}', data-hash='{section.id}/{item.id}')
               span.fs12.line-clamp-1 {item.id}. {item.label}
-      //- pug の場合
-      div(if='{config.type === "pug"}')
-        div.mb32(each='{section in config.sections}')
-          h2.fs14.pl16.mb16 {section.id}. {section.label}
-          div(each='{item in section.items}', class='{"text-royalblue": currentItem === item}')
-            a.link-item.block.px16.py8(href='./{section.id}/{item.id}', data-file='./{section.id}/{item.id}.pug', target='preview', onclick='{onclick}', data-hash='{section.id}/{item.id}')
-              span.fs12.line-clamp-1 {item.id}. {item.label}
-    div.main.w-full.f
+    div.main.w-full.f(show='{currentItem}')
       div#code.col8.h-full.p16
         div.f.flex-between.fm.mb16
           h2 {currentItem.id}. {currentItem.label}
@@ -42,7 +34,7 @@ app
     }
   script.
     this.config = {};
-    this.currentItem = {};
+    this.currentItem = null;
     this.on('mount', async () => {
       // setup config
       await this.fetchConfig();
@@ -55,15 +47,12 @@ app
       if (hash) {
         // var [section_id, item_id] = hash.split('/');
         var target = document.querySelector(`[data-hash="${hash}"]`);
-      }
-      else {
-        var target = document.querySelector('.link-item');
+        target.click();
+        $(this.refs.menus).animate({
+          scrollTop: target.offsetTop - 30,
+        });
       }
       
-      target.click();
-      $(this.refs.menus).animate({
-        scrollTop: target.offsetTop - 30,
-      });
 
       // split
       var sizes = localStorage.getItem('split-sizes');
@@ -86,29 +75,46 @@ app
         this.config = jsyaml.load(text);
         this.configText = text;
         this.update();
-        console.log('update')
+        console.log('update: config')
       }
+    };
+
+    this.fetchCode = async (filename) => {
+      var res = await fetch(filename);
+      var code = await res.text();
+
+      if (this.code != code) {
+        this.code = null;
+        this.update();
+        this.code = code;
+        this.update();
+
+        document.querySelectorAll('pre code').forEach((block) => {
+          hljs.highlightBlock(block);
+        });
+
+        setTimeout(() => {
+          this.update();
+        }, 1000);
+
+        return true;
+      }
+
+      return false;
     };
 
     this.onclick = async (e) => {
       location.hash = e.currentTarget.dataset.hash;
 
-      var file = e.currentTarget.href;
+      var filename = e.currentTarget.href;
       // pug 対応
       if (this.config.type === 'pug') {
-        file = file += '.pug';
+        filename = filename += '.pug';
       }
-      var res = await fetch(file);
       
       this.currentItem = e.item.item;
-      this.code = null;
-      this.update();
-      this.code = await res.text();
-      this.update();
-      
-      document.querySelectorAll('pre code').forEach((block) => {
-        hljs.highlightBlock(block);
-      });
+
+      this.fetchCode(filename);
     };
 
     this.reload = () => {

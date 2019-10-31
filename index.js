@@ -23,19 +23,33 @@ app.get('/', async (req, res) => {
   });
 });
 
-app.get('/config', async (req, res) => {
-  res.json(config);
-});
-
 // pug のときは pug を html に変換して返す
-if (config.type === 'pug') {
-  app.get('/:section_id/:item_id', (req, res) => {
-    var html = pug.renderFile(process.cwd() + `${req.url}.pug`, {
-      pretty: true,
-    });
+app.get('/:section_id/:item_id', (req, res) => {
+  res.setHeader('content-type', 'text/html');
+  var html = '';
+  
+  if (config.type === 'pug') {
+    var filename = `${process.cwd()}${req.url}.pug`;
+    if (fs.existsSync(filename)) {
+      html = pug.renderFile(filename, {
+        pretty: true,
+      });
+    }
+  }
+  else {
+    var filename = `${process.cwd()}${req.url}.html`;
+    if (fs.existsSync(filename)) {
+      html = fs.readFileSync(filename);
+    }
+  }
+
+  if (html) {
     res.send(html);
-  });
-}
+  }
+  else {
+    res.send('File not found');
+  }
+});
 
 // Start the server
 const PORT = process.env.PORT || 8887;
