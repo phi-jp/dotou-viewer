@@ -44,10 +44,12 @@ app
     this.config = {};
     this.currentItem = {};
     this.on('mount', async () => {
-      var res = await fetch('dotou.yaml');
-      var text = await res.text();
-      this.config = jsyaml.load(text);
-      this.update();
+      // setup config
+      await this.fetchConfig();
+      // watch config
+      setInterval(() => {
+        this.fetchConfig();
+      }, 2 * 1000);
 
       var hash = location.hash.substr(1);
       if (hash) {
@@ -74,6 +76,20 @@ app
         }
       });
     });
+
+    this.fetchConfig = async () => {
+      var res = await fetch('dotou.yaml');
+      var text = await res.text();
+
+      // 更新があったらセットする
+      if (this.configText !== text) {
+        this.config = jsyaml.load(text);
+        this.configText = text;
+        this.update();
+        console.log('update')
+      }
+    };
+
     this.onclick = async (e) => {
       location.hash = e.currentTarget.dataset.hash;
 
