@@ -122,6 +122,9 @@ app
       if (this.config.type === 'pug') {
         filename = filename += '.pug';
       }
+      else if (this.config.type === 'riot') {
+        filename = filename += '.pug';
+      }
       
       this.currentItem = e.item.item;
       this.currentItem.path = e.currentTarget.dataset.hash;

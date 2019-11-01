@@ -4,6 +4,6 @@
 ## test
 
 ```
-$ cd test
+$ cd test/html
 $ npm run dev
 ```
