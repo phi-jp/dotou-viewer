@@ -1,5 +1,5 @@
 title: 怒涛の HOGE
-type: pug
+type: html
 sections:
   -
     id: '010'

@@ -24,7 +24,7 @@ app.get('/', async (req, res) => {
 });
 
 // pug のときは pug を html に変換して返す
-app.get('/:section_id/:item_id', (req, res) => {
+app.get('/:section_id/:item_id([^.]+)', (req, res) => {
   res.setHeader('content-type', 'text/html');
   
   if (config.type === 'pug') {
@@ -36,16 +36,27 @@ app.get('/:section_id/:item_id', (req, res) => {
       res.send(html);
     }
     else {
+      fs.writeFileSync(filename, `html\n  body\n    h1 Hello, dotou!`);
       res.send('File not found');
     }
   }
   else if (config.type === 'riot') {
-    res.render('riot-template', {
-      params: {
-        filename: `${req.url}.pug`,
-      },
-      pretty: true,
-    });
+    var filename = `${process.cwd()}${req.url}.pug`;
+
+    console.log(filename);
+
+    if (fs.existsSync(filename)) {
+      res.render('riot-template', {
+        params: {
+          filename: `${req.url}.pug`,
+        },
+        pretty: true,
+      });
+    }
+    else {
+      fs.writeFileSync(filename, `app\n  h1 Hello, dotou!`);
+      res.send('File not found');
+    }
   }
   else {
     var filename = `${process.cwd()}${req.url}.html`;
@@ -54,6 +65,7 @@ app.get('/:section_id/:item_id', (req, res) => {
       res.send(html);
     }
     else {
+      fs.writeFileSync(filename, `<h1>Hello, dotou!</h1>`);
       res.send('File not found');
     }
   }
