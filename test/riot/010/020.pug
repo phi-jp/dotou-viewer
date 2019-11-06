@@ -1,0 +1,11 @@
+app
+  h2 クリックイベント
+  button.button(onclick='{click}') ボタン
+
+  script.
+    this.title = 'クリックイベント';
+
+    this.click = () => {
+      alert('クリックされたよー');
+    };
+

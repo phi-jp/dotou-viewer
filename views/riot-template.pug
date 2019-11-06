@@ -1,0 +1,36 @@
+doctype html
+html.h-full
+  head
+    //- for sp
+    meta(name="viewport", content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,viewport-fit=cover")
+    meta(name="apple-mobile-web-app-capable" content="yes")
+    meta(name="apple-mobile-web-app-status-bar-style" content="black-translucent")
+
+    //- base
+    title Riot.js | dotou viewer
+    meta(name="description" content=description)
+    link(rel="shortcut icon", type="image/x-icon", href="/images/favicon.png")
+    meta(name="viewport", content="width=device-width,height=device-height,user-scalable=no,initial-scale=1,maximum-scale=1,viewport-fit=cover")
+    meta(name="apple-mobile-web-app-capable" content="yes")
+    meta(name="apple-mobile-web-app-status-bar-style" content="default")
+    meta(name="apple-mobile-web-app-title" content="phiary")
+
+    //- style
+
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/less.js/2.5.3/less.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/jade/1.11.0/jade.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/riot/3.13.2/riot+compiler.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js')
+
+    link(rel="stylesheet", href="https://fonts.googleapis.com/icon?family=Material+Icons")
+    link(rel='stylesheet', href='https://cdn.jsdelivr.net/gh/phi-jp/meltline@v0.1.10/meltline.css')
+
+    link(href="https://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")
+
+  body
+    div(data-is='app')
+
+    script(type='riot/tag', template='jade', src= params.filename)
+    script.
+      riot.mount('app');

@@ -1,0 +1,14 @@
+title: 怒涛の HOGE
+type: riot
+sections:
+  -
+    id: '010'
+    label: 基本
+    items:
+      - { id: '010', label: '変数を表示してみよう' }
+      - { id: '020', label: 'クリックしたときのイベントを登録してみよう' }
+  -
+    id: '020'
+    label: TODO リストを作ろう
+    items:
+      - { id: '010', label: 'TODO リストを作ってみた' }

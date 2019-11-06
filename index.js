@@ -26,28 +26,36 @@ app.get('/', async (req, res) => {
 // pug のときは pug を html に変換して返す
 app.get('/:section_id/:item_id', (req, res) => {
   res.setHeader('content-type', 'text/html');
-  var html = '';
   
   if (config.type === 'pug') {
     var filename = `${process.cwd()}${req.url}.pug`;
     if (fs.existsSync(filename)) {
-      html = pug.renderFile(filename, {
+      var html = pug.renderFile(filename, {
         pretty: true,
       });
+      res.send(html);
     }
+    else {
+      res.send('File not found');
+    }
+  }
+  else if (config.type === 'riot') {
+    res.render('riot-template', {
+      params: {
+        filename: `${req.url}.pug`,
+      },
+      pretty: true,
+    });
   }
   else {
     var filename = `${process.cwd()}${req.url}.html`;
     if (fs.existsSync(filename)) {
-      html = fs.readFileSync(filename);
+      var html = fs.readFileSync(filename);
+      res.send(html);
     }
-  }
-
-  if (html) {
-    res.send(html);
-  }
-  else {
-    res.send('File not found');
+    else {
+      res.send('File not found');
+    }
   }
 });
 

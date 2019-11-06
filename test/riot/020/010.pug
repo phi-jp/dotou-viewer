@@ -1,0 +1,94 @@
+app
+  div.p16
+    h1 TODO リスト
+
+    form(onsubmit='{add}')
+      div.f.fm.mb8
+        input.input.mr8(type='text', ref='text')
+        button.button(type='submit') ADD
+
+      button.button(type='button', onclick='{archive}') Archive
+    ul.p32
+      li(each='{task in tasks}')
+        div(data-is='item-task', item='{task}')
+  
+  script.
+    this.on('mount', () => {
+      this.load();
+      this.update();
+
+      this.on('taskchange', () => {
+        this.save();
+      });
+    });
+
+    this.load = () => {
+      var tasks = localStorage.getItem('tasks') || '[]';
+      this.tasks = JSON.parse(tasks);
+      this.update();
+    };
+
+    this.save = () => {
+      var tasks_str = JSON.stringify(this.tasks);
+      localStorage.setItem('tasks', tasks_str);
+    };
+    
+    this.add = (e) => {
+      e.preventDefault();
+      
+      if (!this.refs.text.value) return ;
+
+      this.tasks.push({
+        title: this.refs.text.value,
+        checked: false,
+      });
+      this.save();
+
+      this.refs.text.value = '';
+    };
+
+    this.archive = () => {
+      this.tasks = this.tasks.filter(task => {
+        return task.checked !== true;
+      });
+      this.save();
+      this.update();
+    };
+
+item-task
+  div.f.fm
+    input.mr8(ref='check', type='checkbox', checked='{opts.item.checked}', onchange='{changeChecked}')
+    div
+      div.f.fm(show='{!this.editing}')
+        div.p4(onclick='{startEdit}') {opts.item.title}
+      div(show='{this.editing}')
+        input.p4(ref='input', type='text', value='{opts.item.title}', onblur='{finishEdit}')
+
+  script.
+    this.on('mount', () => {
+      this.editing = false;
+    });
+
+    this.startEdit = () => {
+      this.editing = true;
+      this.update();
+      this.refs.input.focus();
+      this.refs.input.select();
+    };
+
+    this.finishEdit = () => {
+      this.editing = false;
+      this.opts.item.title = this.refs.input.value;
+      this.parent.trigger('taskchange', {
+        item: opts.item,
+      });
+      this.update();
+    };
+
+    this.changeChecked = () => {
+      this.opts.item.checked = this.refs.check.checked;
+      this.parent.trigger('taskchange', {
+        item: opts.item,
+      });
+    };
+    
