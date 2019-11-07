@@ -23,51 +23,50 @@ app.get('/', async (req, res) => {
   });
 });
 
+var writeFile = (filename, text) => {
+  const DIR_NAME = path.dirname(filename);
+  if (DIR_NAME.length > 1 && !fs.existsSync(DIR_NAME)) {
+    fs.mkdirSync(DIR_NAME, { recursive: true });
+  }
+  fs.writeFileSync(filename, text);
+};
+
 // pug のときは pug を html に変換して返す
 app.get('/:section_id/:item_id([^.]+)', (req, res) => {
   res.setHeader('content-type', 'text/html');
   
   if (config.type === 'pug') {
     var filename = `${process.cwd()}${req.url}.pug`;
-    if (fs.existsSync(filename)) {
-      var html = pug.renderFile(filename, {
-        pretty: true,
-      });
-      res.send(html);
+    if (!fs.existsSync(filename)) {
+      writeFile(filename, `html\n  body\n    h1 Hello, dotou!`);
     }
-    else {
-      fs.writeFileSync(filename, `html\n  body\n    h1 Hello, dotou!`);
-      res.send('File not found');
-    }
+    var html = pug.renderFile(filename, {
+      pretty: true,
+    });
+    res.send(html);
   }
   else if (config.type === 'riot') {
     var filename = `${process.cwd()}${req.url}.pug`;
 
     console.log(filename);
 
-    if (fs.existsSync(filename)) {
-      res.render('riot-template', {
-        params: {
-          filename: `${req.url}.pug`,
-        },
-        pretty: true,
-      });
+    if (!fs.existsSync(filename)) {
+      writeFile(filename, `app\n  h1 Hello, dotou!`);
     }
-    else {
-      fs.writeFileSync(filename, `app\n  h1 Hello, dotou!`);
-      res.send('File not found');
-    }
+    res.render('riot-template', {
+      params: {
+        filename: `${req.url}.pug`,
+      },
+      pretty: true,
+    });
   }
   else {
     var filename = `${process.cwd()}${req.url}.html`;
-    if (fs.existsSync(filename)) {
-      var html = fs.readFileSync(filename);
-      res.send(html);
+    if (!fs.existsSync(filename)) {
+      writeFile(filename, `<h1>Hello, dotou!</h1>`);
     }
-    else {
-      fs.writeFileSync(filename, `<h1>Hello, dotou!</h1>`);
-      res.send('File not found');
-    }
+    var html = fs.readFileSync(filename);
+    res.send(html);
   }
 });
 
