@@ -76,5 +76,6 @@ app.get('/:section_id/:item_id([^.]+)', (req, res) => {
 const PORT = process.env.PORT || 8887;
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
+  console.log(`Access to http://localhost:${PORT}`);
   console.log('Press Ctrl+C to quit.');
 });
