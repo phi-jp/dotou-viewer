@@ -5,7 +5,7 @@ sections:
     id: '010'
     label: カラー
     items:
-      - { id: '010', label: 'テキストの色を赤にしよう(text-red)' }
+      - { id: '010', label: 'テキストの色を赤にしよう(text-red)', description: '説明文を表示する' }
       - { id: '020', label: '背景の色を黄色にしよう(bg-yellow)' }
       - { id: '030', label: 'ボーダーの色を青にしよう(border border-blue)' }
       - { id: '040', label: '文字の色をグラデーションで指定しよう(text-aquasplash)' }

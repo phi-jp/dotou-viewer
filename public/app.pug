@@ -5,14 +5,16 @@ app
         a(href='/') {config.title}
       div
         div.mb32(each='{section in config.sections}')
-          h2.fs14.pl16.mb16 {section.id}. {section.label}
-          div(each='{item in section.items}', class='{"text-royalblue": currentItem === item}')
+          h2.fs14.pl16.mb16 {section.label}
+          div.ml8(each='{item in section.items}', class='{"text-royalblue": currentItem === item}')
             a.link-item.block.px16.py8(href='{section.id}/{item.id}', onclick='{onclick}', data-hash='{section.id}/{item.id}')
-              span.fs12.line-clamp-1 {item.id}. {item.label}
+              span.fs12.line-clamp-1 {item.label}
     div.main.w-full.f(show='{currentItem}')
-      div#code.col8.h-full.p16
+      div#code.col8.h-full.p16.overflow-scroll
         div.f.flex-between.fm.mb16
-          h2 {currentItem.id}. {currentItem.label}
+          div
+            h2 {currentItem.id}. {currentItem.label}
+            p(if='{currentItem.description}') {currentItem.description}
           div.f.fm
             a.button.ml8(href='{currentItem.path}', target='_blank')
               i.material-icons fullscreen
@@ -21,7 +23,7 @@ app
         pre(if='{code}')
           code.fs13 {code}
       div#preview.col4.h-full.p16.bg-whitesmoke
-        iframe.bg-white.border-none.s-full(name='preview', ref='preview', src='{currentItem.path}')
+        iframe.bg-white.border-none.s-full.box-shadow(name='preview', ref='preview', src='{currentItem.path}')
   style(scoped, type='less').
     :scope {
       display: block;
@@ -30,6 +32,9 @@ app
       .gutter {
         background-color: hsla(0, 0%, 0%, 0.20);
         cursor: col-resize;
+      }
+      .box-shadow {
+        box-shadow: 0px 0px 8px #aaa;
       }
     }
   script.
