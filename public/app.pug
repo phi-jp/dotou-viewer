@@ -17,13 +17,19 @@ app
             p(if='{currentItem.description}') {currentItem.description}
           div.f.fm
             a.button.ml8(href='{currentItem.path}', target='_blank')
-              i.material-icons fullscreen
+              i.material-icons play_arrow
             button.button.ml8(onclick='{reload}')
               i.material-icons refresh
         pre(if='{code}')
           code.fs13 {code}
-      div#preview.col4.h-full.p16.bg-whitesmoke
-        iframe.bg-white.border-none.s-full.box-shadow(name='preview', ref='preview', src='{currentItem.path}')
+      div#preview.col4.h-full.p16.bg-whitesmoke.relative
+        iframe.bg-white.border-none.s-full.box-shadow(name='preview', ref='preview', src='{currentItem.path}', class='{"fixed trbl0": mode === "fullscreen"}')
+
+        div.absolute.t0.r0.p32
+          button.button.ml8(onclick='{expand}', if='{mode !== "fullscreen"}')
+            i.material-icons fullscreen
+          button.button.ml8(onclick='{shrink}', if='{mode === "fullscreen"}')
+            i.material-icons fullscreen_exit
   style(scoped, type='less').
     :scope {
       display: block;
@@ -66,6 +72,9 @@ app
           localStorage.setItem('split-sizes', JSON.stringify(sizes));
         }
       });
+
+      this.updateMode();
+
     });
 
     this.fetchConfig = async () => {
@@ -140,4 +149,37 @@ app
 
     this.reload = () => {
       this.refs.preview.contentWindow.location.reload();
+    };
+
+    this.expand = () => {
+      var url = `${location.pathname}?mode=fullscreen${location.hash}`;
+      history.pushState(null, null, url);
+      this.updateMode();
+    };
+
+    this.shrink = () => {
+      var url = `${location.pathname}${location.hash}`;
+      history.pushState(null, null, url);
+      this.updateMode();
+    };
+
+    window.addEventListener('popstate', () => {
+      this.updateMode();
+    }, false);
+
+    this.updateMode = () => {
+      // setup query
+      var obj = {};
+      location.search.substr(1).split('&').forEach(pair => {
+        var [key, value] = pair.split('=');
+        obj[key] = value;
+      });
+
+      if (obj.mode === 'fullscreen') {
+        this.mode = 'fullscreen';
+      }
+      else {
+        this.mode = '';
+      }
+      this.update();
     };
