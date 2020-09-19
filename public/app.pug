@@ -79,7 +79,7 @@ app
     });
 
     this.fetchConfig = async () => {
-      var res = await fetch(`/${this.content_id}/dotou.yaml`);
+      var res = await fetch(`/${this.content_id}/contents.yaml`);
       var text = await res.text();
 
       // 更新があったらセットする
