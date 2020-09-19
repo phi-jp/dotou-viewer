@@ -7,7 +7,7 @@ app
         div.mb32(each='{section in config.sections}')
           h2.fs14.pl16.mb16 {section.label}
           div.ml8(each='{item in section.items}', class='{"text-royalblue": currentItem === item}')
-            a.link-item.block.px16.py8(href='{section.id}/{item.id}', onclick='{onclick}', data-hash='{section.id}/{item.id}')
+            a.link-item.block.px16.py8(href='/{content_id}/{section.id}/{item.id}', onclick='{onclick}', data-hash='{section.id}/{item.id}')
               span.fs12.line-clamp-1 {item.label}
     div.main.w-full.f(show='{currentItem}')
       div#code.col8.h-full.p16.overflow-scroll
@@ -46,6 +46,8 @@ app
   script.
     riot.util.tmpl.errorHandler = function() {};
 
+    this.content_id = location.pathname.replace(/\//g, '');
+
     this.on('mount', async () => {
       // setup config
       await this.fetchConfig();
@@ -74,11 +76,10 @@ app
       });
 
       this.updateMode();
-
     });
 
     this.fetchConfig = async () => {
-      var res = await fetch('dotou.yaml');
+      var res = await fetch(`/${this.content_id}/dotou.yaml`);
       var text = await res.text();
 
       // 更新があったらセットする
@@ -139,9 +140,8 @@ app
       else if (this.config.type === 'riot') {
         filename = filename += '.pug';
       }
-      
       this.currentItem = e.item.item;
-      this.currentItem.path = e.currentTarget.dataset.hash;
+      this.currentItem.path = `/${this.content_id}/${e.currentTarget.dataset.hash}`;
       this.currentItem.filename = filename;
 
       this.fetchCode(filename);

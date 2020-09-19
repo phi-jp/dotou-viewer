@@ -31,7 +31,7 @@ html.h-full
     script(src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js')
 
     link(rel="stylesheet", href="https://fonts.googleapis.com/icon?family=Material+Icons")
-    link(rel='stylesheet', href='https://cdn.jsdelivr.net/gh/phi-jp/meltline@v0.1.10/meltline.css')
+    link(rel='stylesheet', href='https://cdn.jsdelivr.net/gh/phi-jp/meltline@v0.1.12/meltline.css')
 
     link(rel="stylesheet", href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.10/build/styles/default.min.css")
     script(src='//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.10/build/highlight.min.js')
@@ -41,8 +41,8 @@ html.h-full
     link(href="https://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")
 
   body
-    div(data-is='app')
+    div.container-1024.p32
+      h1= config.title
 
-    script(type='riot/tag', template='jade', src='/app.pug')
-    script.
-      riot.mount('app');
+      ul.p32: each content in config.contents
+        li: a.text-blue(href=`/${content.id}`)= content.label

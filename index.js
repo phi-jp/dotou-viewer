@@ -8,6 +8,14 @@ const config = yaml.safeLoad(fs.readFileSync(`${process.cwd()}/dotou.yaml`));
 const express = require('express');
 const app = express();
 
+// setup config
+config.contents = config.contents.map(content => {
+  console.log(content);
+  content.config = yaml.safeLoad(fs.readFileSync(`${process.cwd()}/${content.file}`));
+  return content;
+});
+
+
 // setup express
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
@@ -25,6 +33,13 @@ app.get('/', async (req, res) => {
   });
 });
 
+app.get('/:content', async (req, res) => {
+  var content_config = config.contents.find(item => item.id === req.params.content);
+  res.render('contents', {
+    config: content_config,
+  });
+});
+
 var writeFile = (filename, text) => {
   const DIR_NAME = path.dirname(filename);
   if (DIR_NAME.length > 1 && !fs.existsSync(DIR_NAME)) {
@@ -34,7 +49,9 @@ var writeFile = (filename, text) => {
 };
 
 // pug のときは pug を html に変換して返す
-app.get('/:section_id/:item_id([^.]+)', (req, res) => {
+app.get('/:content/:section_id/:item_id([^.]+)', (req, res) => {
+  var content_config = config.contents.find(item => item.id === req.params.content);
+
   res.setHeader('content-type', 'text/html');
   
   if (config.type === 'pug') {

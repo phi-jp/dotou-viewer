@@ -7,13 +7,20 @@ html.h-full
     meta(name="apple-mobile-web-app-status-bar-style" content="black-translucent")
 
     //- base
-    title Riot.js | dotou viewer
+    title= config.title
     meta(name="description" content=description)
     link(rel="shortcut icon", type="image/x-icon", href="/images/favicon.png")
     meta(name="viewport", content="width=device-width,height=device-height,user-scalable=no,initial-scale=1,maximum-scale=1,viewport-fit=cover")
     meta(name="apple-mobile-web-app-capable" content="yes")
     meta(name="apple-mobile-web-app-status-bar-style" content="default")
     meta(name="apple-mobile-web-app-title" content="phiary")
+
+    //- ogp
+    meta(name="twitter:card" content="summary_large_image")
+    meta(property="og:title" content=config.title)
+    meta(property="og:description" content=description)
+    meta(property="og:type" content="website")
+    //- meta(property="og:image" content=ogp.image || settings.image)
 
     //- style
 
@@ -26,11 +33,16 @@ html.h-full
     link(rel="stylesheet", href="https://fonts.googleapis.com/icon?family=Material+Icons")
     link(rel='stylesheet', href='https://cdn.jsdelivr.net/gh/phi-jp/meltline@v0.1.12/meltline.css')
 
+    link(rel="stylesheet", href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.10/build/styles/default.min.css")
+    script(src='//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.10/build/highlight.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/js-yaml/3.4.2/js-yaml.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/split.js/1.5.11/split.min.js')
+
     link(href="https://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")
 
   body
     div(data-is='app')
 
-    script(type='riot/tag', template='jade', src= params.filename)
+    script(type='riot/tag', template='jade', src='/app.pug')
     script.
       riot.mount('app');

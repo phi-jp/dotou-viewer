@@ -1,0 +1,5 @@
+title: 怒涛のテスト
+
+contents:
+  - { id: 'html', label: 'html の怒涛', file: 'html/dotou.yaml' }
+  - { id: 'riot', label: 'riot の怒涛', file: 'riot/dotou.yaml' }
