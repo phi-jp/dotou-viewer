@@ -1,12 +1,16 @@
 
-var temp = console.log;
 
-console.log = (...args) => {
-  temp(...args);
+// console のメソッドを overlap して親フレームに post message する
+['log', 'dir'].forEach((method) => {
+  var temp = console[method];
 
-  var req = {
-    method: 'log',
-    args: args,
+  console[method] = (...args) => {
+    temp(...args);
+  
+    var req = {
+      method: method,
+      args: args,
+    };
+    window.parent.postMessage(JSON.stringify(req), '*');
   };
-  window.parent.postMessage(JSON.stringify(req), '*');
-};
+});

@@ -204,13 +204,26 @@ module-console
 
     div.overflow-scroll
       div.border-bottom(each='{log in logs}')
-        div.px8.py4.fs13 {log}
+        pre.px8.py4.fs13 {log}
 
   script.
     this.logs = [];
 
     this.log = (data) => {
-      this.logs.push(data.args.join(' '));
+      var str = '';
+
+      // method に応じて文字列化
+      if (data.method === 'log') {
+        str = data.args.join(' ');
+      }
+      else if (data.method === 'dir') {
+        str = JSON.stringify(data.args[0], null, '  ');
+      }
+
+      if (str) {
+        this.logs.push(str);
+      }
+
       this.update();
     };
 
