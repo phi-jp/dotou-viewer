@@ -10,18 +10,21 @@ app
             a.link-item.block.px16.py8(href='/{content_id}/{section.id}/{item.id}', onclick='{onclick}', data-hash='{section.id}/{item.id}')
               span.fs12.line-clamp-1 {item.label}
     div.main.w-full.f(show='{currentItem}')
-      div#code.col8.h-full.p16.overflow-scroll
-        div.f.flex-between.fm.mb16
-          div
-            h2 {currentItem.id}. {currentItem.label}
-            p(if='{currentItem.description}') {currentItem.description}
-          div.f.fm
-            a.button.ml8(href='{currentItem.path}', target='_blank')
-              i.material-icons play_arrow
-            button.button.ml8(onclick='{reload}')
-              i.material-icons refresh
-        pre(if='{code}')
-          code.fs13 {code}
+      div#code.col8.h-full.p16.f.flex-column.overflow-scroll
+        div.h60per.f.flex-column.pb16
+          div.f.flex-between.fm.mb16
+            div
+              h2 {currentItem.id}. {currentItem.label}
+              p(if='{currentItem.description}') {currentItem.description}
+            div.f.fm
+              a.button.ml8(href='{currentItem.path}', target='_blank')
+                i.material-icons play_arrow
+              button.button.ml8(onclick='{reload}')
+                i.material-icons refresh
+          pre.overflow-scroll(if='{code}')
+            code.fs13 {code}
+        div.h40per
+          div.h-full.box-shadow-2(data-is='module-console')
       div#preview.col4.h-full.p16.bg-whitesmoke.relative
         iframe.bg-white.border-none.s-full.box-shadow(name='preview', ref='preview', src='{currentItem.path}', class='{"fixed trbl0": mode === "fullscreen"}')
 
@@ -144,10 +147,14 @@ app
       this.currentItem.path = `/${this.content_id}/${e.currentTarget.dataset.hash}`;
       this.currentItem.filename = filename;
 
+      this.tags['module-console'].clear();
+
       this.fetchCode(filename);
     };
 
     this.reload = () => {
+      this.tags['module-console'].clear();
+
       this.refs.preview.contentWindow.location.reload();
     };
 
@@ -181,5 +188,33 @@ app
       else {
         this.mode = '';
       }
+      this.update();
+    };
+
+    window.addEventListener('message', (e) => {
+      var data = JSON.parse(e.data);
+      this.tags['module-console'].log(data);
+    });
+
+
+module-console
+  div.h-full.overflow-hidden.f.flex-column
+    div.p8.border-bottom.bg-whitesmoke
+      span.bold.fs12.bold console
+
+    div.overflow-scroll
+      div.border-bottom(each='{log in logs}')
+        div.px8.py4.fs13 {log}
+
+  script.
+    this.logs = [];
+
+    this.log = (data) => {
+      this.logs.push(data.args.join(' '));
+      this.update();
+    };
+
+    this.clear = () => {
+      this.logs = [];
       this.update();
     };

@@ -85,6 +85,10 @@ app.get('/:content/:section_id/:item_id([^.]+)', (req, res) => {
       writeFile(filename, `<h1>Hello, dotou!</h1>`);
     }
     var html = fs.readFileSync(filename);
+
+    // console wrapper を追加
+    html = '<script src="/console.js"></script>' + html;
+    
     res.send(html);
   }
 });
