@@ -10,7 +10,6 @@ const app = express();
 
 // setup config
 config.contents = config.contents.map(content => {
-  console.log(content);
   content.config = yaml.safeLoad(fs.readFileSync(`${process.cwd()}/${content.file}`));
   return content;
 });
@@ -88,7 +87,7 @@ app.get('/:content/:section_id/:item_id([^.]+)', (req, res) => {
 
     // console wrapper を追加
     html = '<script src="/console.js"></script>' + html;
-    
+
     res.send(html);
   }
 });
