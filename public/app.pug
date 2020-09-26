@@ -23,7 +23,7 @@ app
                 i.material-icons refresh
           //- pre.overflow-scroll(if='{code}')
           //-   code.fs13 {code}
-          div.s-full(data-is='atom-editor', language='{config.type}')
+          div.s-full(if='{config}', data-is='atom-editor', language='{config.type}')
         div.h40per
           div.h-full.box-shadow-2(data-is='module-console')
       div#preview.col4.h-full.p16.bg-whitesmoke.relative
@@ -84,6 +84,9 @@ app
 
       // setup editor
       this.tags['atom-editor'].on('save', () => {
+        this.save();
+      });
+      this.tags['atom-editor'].on('blur', () => {
         this.save();
       });
     });
@@ -271,9 +274,15 @@ atom-editor
     });
 
     this.setup = async () => {
+      var language = {
+        'html': 'html',
+        'riot': 'pug',
+        'pug': 'pug',
+      }[this.opts.language];
+
       var editor = monaco.editor.create(this.refs.editor, {
         value: '',
-        language: this.opts.language || 'html',
+        language: language || 'html',
         minimap: {
           enabled: false,
         },
@@ -295,9 +304,15 @@ atom-editor
         insertSpaces: true,
       });
 
-      // 保存イベント
+      // イベント
       editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, (e) => {
         this.trigger('save');
+      });
+      editor.onDidFocusEditorText((e) => {
+        this.trigger('focus');
+      });
+      editor.onDidBlurEditorText((e) => {
+        this.trigger('blur');
       });
 
       this.editor = editor;

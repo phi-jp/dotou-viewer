@@ -50,8 +50,7 @@ var writeFile = (filename, text) => {
 
 // pug のときは pug を html に変換して返す
 app.get('/:content/:section_id/:item_id([^.]+)', (req, res) => {
-  var content_config = config.contents.find(item => item.id === req.params.content);
-
+  var content_config = config.contents.find(item => item.id === req.params.content).config;
   var url = URL.parse(req.url);
 
   res.setHeader('content-type', 'text/html');
@@ -96,7 +95,19 @@ app.get('/:content/:section_id/:item_id([^.]+)', (req, res) => {
 });
 
 app.put('/:content/:section_id/:item_id([^.]+)', (req, res) => {
-  var filename = `${process.cwd()}${req.url}.html`;
+  var content_config = config.contents.find(item => item.id === req.params.content).config;
+  var url = URL.parse(req.url);
+
+  if (content_config.type === 'pug') {
+    var filename = `${process.cwd()}${url.pathname}.pug`;
+  }
+  else if (content_config.type === 'riot') {
+    var filename = `${process.cwd()}${url.pathname}.pug`;
+  }
+  else {
+    var filename = `${process.cwd()}${url.pathname}.html`;
+  }
+
 
   if (fs.existsSync(filename)) {
     fs.writeFileSync(filename, req.body.content);

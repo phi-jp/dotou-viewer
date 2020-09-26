@@ -2,4 +2,5 @@ title: 怒涛のテスト
 
 contents:
   - { id: 'html', label: 'html の怒涛', file: 'html/contents.yaml' }
+  - { id: 'pug', label: 'pug の怒涛', file: 'pug/contents.yaml' }
   - { id: 'riot', label: 'riot の怒涛', file: 'riot/contents.yaml' }
