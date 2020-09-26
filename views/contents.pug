@@ -38,6 +38,8 @@ html.h-full
     script(src='https://cdnjs.cloudflare.com/ajax/libs/js-yaml/3.4.2/js-yaml.js')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/split.js/1.5.11/split.min.js')
 
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.18.1/min/vs/loader.js')
+
     link(href="https://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")
 
   body
@@ -45,4 +47,19 @@ html.h-full
 
     script(type='riot/tag', template='jade', src='/app.pug')
     script.
-      riot.mount('app');
+      var setupMonaco = () => {
+        return new Promise((resolve) => {
+          require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.18.1/min/vs' }});
+          require(['vs/editor/editor.main'], () => {
+            resolve();
+          });
+        });
+      };
+
+      var main = async () => {
+        await setupMonaco();
+        riot.mount('app');
+      };
+
+      main();
+

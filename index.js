@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const URL = require('url');
 const yaml = require('js-yaml');
 const pug = require('pug');
 const config = yaml.safeLoad(fs.readFileSync(`${process.cwd()}/dotou.yaml`));
@@ -17,7 +18,7 @@ config.contents = config.contents.map(content => {
 
 // setup express
 app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(`${__dirname}/public`));
 app.use(express.static(`${process.cwd()}`));
 
@@ -51,10 +52,12 @@ var writeFile = (filename, text) => {
 app.get('/:content/:section_id/:item_id([^.]+)', (req, res) => {
   var content_config = config.contents.find(item => item.id === req.params.content);
 
+  var url = URL.parse(req.url);
+
   res.setHeader('content-type', 'text/html');
   
-  if (config.type === 'pug') {
-    var filename = `${process.cwd()}${req.url}.pug`;
+  if (content_config.type === 'pug') {
+    var filename = `${process.cwd()}${url.pathname}.pug`;
     if (!fs.existsSync(filename)) {
       writeFile(filename, `html\n  body\n    h1 Hello, dotou!`);
     }
@@ -63,33 +66,45 @@ app.get('/:content/:section_id/:item_id([^.]+)', (req, res) => {
     });
     res.send(html);
   }
-  else if (config.type === 'riot') {
-    var filename = `${process.cwd()}${req.url}.pug`;
-
-    console.log(filename);
+  else if (content_config.type === 'riot') {
+    var filename = `${process.cwd()}${url.pathname}.pug`;
 
     if (!fs.existsSync(filename)) {
       writeFile(filename, `app\n  h1 Hello, dotou!`);
     }
     res.render('riot-template', {
       params: {
-        filename: `${req.url}.pug`,
+        filename: `${url.pathname}.pug`,
       },
       pretty: true,
     });
   }
   else {
-    var filename = `${process.cwd()}${req.url}.html`;
+    var filename = `${process.cwd()}${url.pathname}.html`;
     if (!fs.existsSync(filename)) {
       writeFile(filename, `<h1>Hello, dotou!</h1>`);
     }
     var html = fs.readFileSync(filename);
 
     // console wrapper を追加
-    html = '<script src="/console.js"></script>' + html;
+    if (req.query.console === 'true') {
+      html = '<script src="/console.js"></script>' + html;
+    }
 
     res.send(html);
   }
+});
+
+app.put('/:content/:section_id/:item_id([^.]+)', (req, res) => {
+  var filename = `${process.cwd()}${req.url}.html`;
+
+  if (fs.existsSync(filename)) {
+    fs.writeFileSync(filename, req.body.content);
+  }
+
+  res.json({
+    status: '200',
+  });
 });
 
 // Start the server
