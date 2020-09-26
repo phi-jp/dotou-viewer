@@ -125,20 +125,22 @@ app
     };
 
     this.watch = async () => {
-      return ;
-      this.fetchConfig();
+      // フォーカスしてないときのみ watch する
+      if (!this.tags['atom-editor'].isFocused()) {
+        this.fetchConfig();
 
-      if (this.currentItem) {
-        var is_refresh = await this.fetchCode(this.currentItem.filename);
+        if (this.currentItem) {
+          var is_refresh = await this.fetchCode(this.currentItem.filename);
 
-        if (is_refresh) {
-          this.reload();
+          if (is_refresh) {
+            this.reload();
+          }
         }
       }
+
       // 再帰呼び出し
       setTimeout(() => {
         this.watch();
-
       }, 2 * 1000);
     };
 
@@ -302,12 +304,13 @@ atom-editor
     };
 
     this.setValue = (v) => {
-      if (!this.editor) return ;
       this.editor.setValue(v);
     };
 
     this.getValue = () => {
-      if (!this.editor) return '';
-
       return this.editor.getValue();
+    };
+
+    this.isFocused = () => {
+      return this.editor.hasTextFocus();
     };
