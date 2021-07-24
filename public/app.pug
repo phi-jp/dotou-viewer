@@ -21,18 +21,20 @@ app
                 i.material-icons play_arrow
               button.button.ml8(onclick='{reload}')
                 i.material-icons refresh
-          pre.overflow-scroll(if='{code}')
-            code.fs13 {code}
+          //- pre.overflow-scroll(if='{code}')
+          //-   code.fs13 {code}
+          div.s-full(if='{config}', data-is='atom-editor', language='{config.type}')
         div.h40per
           div.h-full.box-shadow-2(data-is='module-console')
       div#preview.col4.h-full.p16.bg-whitesmoke.relative
-        iframe.bg-white.border-none.s-full.box-shadow(name='preview', ref='preview', src='{currentItem.path}', class='{"fixed trbl0": mode === "fullscreen"}')
+        iframe.bg-white.border-none.s-full.box-shadow(name='preview', ref='preview', src='{currentItem.path}?console=true', class='{"fixed trbl0": mode === "fullscreen"}')
 
         div.absolute.t0.r0.p32
           button.button.ml8(onclick='{expand}', if='{mode !== "fullscreen"}')
             i.material-icons fullscreen
           button.button.ml8(onclick='{shrink}', if='{mode === "fullscreen"}')
             i.material-icons fullscreen_exit
+
   style(scoped, type='less').
     :scope {
       display: block;
@@ -79,6 +81,14 @@ app
       });
 
       this.updateMode();
+
+      // setup editor
+      this.tags['atom-editor'].on('save', () => {
+        this.save();
+      });
+      this.tags['atom-editor'].on('blur', () => {
+        this.save();
+      });
     });
 
     this.fetchConfig = async () => {
@@ -98,15 +108,18 @@ app
       var res = await fetch(filename);
       var code = await res.text();
 
-      if (this.code != code) {
-        this.code = null;
-        this.update();
-        this.code = code;
-        this.update();
+      if (this.tags['atom-editor'].getValue() != code) {
+        //- this.code = null;
+        //- this.update();
+        //- this.code = code;
+        //- this.update();
 
-        document.querySelectorAll('pre code').forEach((block) => {
-          hljs.highlightBlock(block);
-        });
+        //- document.querySelectorAll('pre code').forEach((block) => {
+        //-   hljs.highlightBlock(block);
+        //- });
+
+        this.tags['atom-editor'].setValue(code);
+        this.update();
 
         return true;
       }
@@ -115,19 +128,22 @@ app
     };
 
     this.watch = async () => {
-      this.fetchConfig();
+      // フォーカスしてないときのみ watch する
+      if (!this.tags['atom-editor'].isFocused()) {
+        this.fetchConfig();
 
-      if (this.currentItem) {
-        var is_refresh = await this.fetchCode(this.currentItem.filename);
+        if (this.currentItem) {
+          var is_refresh = await this.fetchCode(this.currentItem.filename);
 
-        if (is_refresh) {
-          this.reload();
+          if (is_refresh) {
+            this.reload();
+          }
         }
       }
+
       // 再帰呼び出し
       setTimeout(() => {
         this.watch();
-
       }, 2 * 1000);
     };
 
@@ -196,6 +212,22 @@ app
       this.tags['module-console'].log(data);
     });
 
+    this.save = async () => {
+      await fetch(this.currentItem.path, {
+        method: 'PUT',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          content: this.tags['atom-editor'].getValue(),
+        }),
+      });
+
+      console.log('saved!');
+
+      this.reload();
+    };
+
 
 module-console
   div.h-full.overflow-hidden.f.flex-column
@@ -230,4 +262,70 @@ module-console
     this.clear = () => {
       this.logs = [];
       this.update();
+    };
+
+
+atom-editor
+  div.s-full(ref='editor',tabindex='1')
+
+  script.
+    this.on('mount', () => {
+      this.setup();
+    });
+
+    this.setup = async () => {
+      var language = {
+        'html': 'html',
+        'riot': 'pug',
+        'pug': 'pug',
+      }[this.opts.language];
+
+      var editor = monaco.editor.create(this.refs.editor, {
+        value: '',
+        language: language || 'html',
+        minimap: {
+          enabled: false,
+        },
+        // エディタのスタイル("vs" | "vs-dark" | "hc-black")
+        theme: 'vs-dark',
+        lineNumbers: false,
+
+        autoClosingQuotes: 'always',
+
+        // 画面をリサイズしたときに自動的にエディタをリサイズする
+        automaticLayout: true,
+
+        // オートインデントを有効化(bracketsとか)
+        autoIndent: true,
+      });
+      var model = editor.getModel();
+      model.updateOptions({
+        tabSize: 2,
+        insertSpaces: true,
+      });
+
+      // イベント
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, (e) => {
+        this.trigger('save');
+      });
+      editor.onDidFocusEditorText((e) => {
+        this.trigger('focus');
+      });
+      editor.onDidBlurEditorText((e) => {
+        this.trigger('blur');
+      });
+
+      this.editor = editor;
+    };
+
+    this.setValue = (v) => {
+      this.editor.setValue(v);
+    };
+
+    this.getValue = () => {
+      return this.editor.getValue();
+    };
+
+    this.isFocused = () => {
+      return this.editor.hasTextFocus();
     };

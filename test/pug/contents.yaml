@@ -1,0 +1,8 @@
+title: 怒涛の pug
+type: pug
+sections:
+  -
+    id: '010'
+    label: 基本
+    items:
+      - { id: '010', label: 'タイトルを表示してみよう' }
