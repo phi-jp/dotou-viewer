@@ -40,7 +40,7 @@ html.h-full
     script(src='https://cdnjs.cloudflare.com/ajax/libs/js-yaml/3.4.2/js-yaml.js')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/split.js/1.5.11/split.min.js')
 
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.18.1/min/vs/loader.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.js')
 
     link(href="https://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")
 
@@ -51,7 +51,7 @@ html.h-full
     script.
       var setupMonaco = () => {
         return new Promise((resolve) => {
-          require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.18.1/min/vs' }});
+          require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs' }});
           require(['vs/editor/editor.main'], () => {
             resolve();
           });
