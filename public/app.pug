@@ -207,9 +207,19 @@ app
       this.update();
     };
 
+    // 受け取った情報をコンソールに表示
     window.addEventListener('message', (e) => {
-      var data = JSON.parse(e.data);
-      this.tags['module-console'].log(data);
+      var data = e.data;
+
+      // 文字列だったらオブジェクトに変換する
+      if (typeof data === 'string') {
+        data = JSON.parse(e.data);
+      }
+
+      // method があれば console area に表示
+      if (data.method) {
+        this.tags['module-console'].log(data);
+      }
     });
 
     this.save = async () => {

@@ -36,3 +36,6 @@ html.h-full
     script(type='riot/tag', template='jade', src= params.filename)
     script.
       riot.mount('app');
+
+    if (console)
+      script(src="/console.js")

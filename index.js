@@ -75,6 +75,7 @@ app.get('/:content/:section_id/:item_id([^.]+)', (req, res) => {
       params: {
         filename: `${url.pathname}.pug`,
       },
+      console: req.query.console,
       pretty: true,
     });
   }
