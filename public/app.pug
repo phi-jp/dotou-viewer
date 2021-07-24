@@ -14,8 +14,8 @@ app
         div.h60per.f.flex-column.pb16
           div.f.flex-between.fm.mb16
             div
-              h2 {currentItem.id}. {currentItem.label}
-              p(if='{currentItem.description}') {currentItem.description}
+              h2.fs18.mb8 {currentItem.id}. {currentItem.label}
+              p(data-is='atom-markdown', if='{currentItem.description}', content='{currentItem.description}')
             div.f.fm
               a.button.ml8(href='{currentItem.path}', target='_blank')
                 i.material-icons play_arrow
@@ -339,3 +339,54 @@ atom-editor
     this.isFocused = () => {
       return this.editor.hasTextFocus();
     };
+
+
+atom-markdown
+  style(scoped, type='less').
+    :scope {
+      display: block;
+      a {
+        color: #4169e1;
+      }
+    }
+  script.
+    var self = this;
+
+    this.on('mount', () => {
+      this.root.addEventListener('click', (e) => {
+        var target = e.target;
+        var anchor = e.path.find(elm => elm.nodeName === 'A');
+        // aタグの場合 url は webview で開く
+        if (anchor) {
+          e.preventDefault();
+          e.stopPropagation();
+          var url = anchor.getAttribute('href');
+          window.open(url);
+        }
+      });
+    });
+
+    this.setContent = (content) => {
+      // 条件１：読み込む順番対策、条件２：無限ループの解消を
+      if (!content) {
+        this.root.innerHTML = '';
+        this.content = null;
+      }
+      else if (this.content != content ) {
+        this.content = content; // 条件２用
+
+        this.root.innerHTML = marked(content, {
+          breaks: true,
+          sanitize: (typeof this.opts.sanitize === "boolean") ? this.opts.sanitize : true,
+        });
+        this.update();
+      }
+    };
+
+    this.on('mount', function() {
+      self.setContent(self.opts.content);
+    });
+
+    this.on('update', function() {
+      self.setContent(self.opts.content);
+    });

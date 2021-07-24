@@ -5,7 +5,7 @@ sections:
     id: '010'
     label: 基本
     items:
-      - { id: '010', label: '変数を表示してみよう' }
+      - { id: '010', label: '変数を表示してみよう', description: 'https://rabee.jp テスト' }
       - { id: '020', label: 'クリックしたときのイベントを登録してみよう' }
       - { id: '030', label: 'ファイルがない場合' }
   -
